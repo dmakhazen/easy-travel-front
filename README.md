@@ -29,6 +29,13 @@ See [Vite Configuration Reference](https://vite.dev/config/).
 npm install
 ```
 
+В корне проекта создать файл .env.local c переменными supabase:
+
+VITE_SUPABASE_URL=<SUBSTITUTE_SUPABASE_URL>
+VITE_SUPABASE_PUBLISHABLE_KEY=<SUBSTITUTE_SUPABASE_PUBLISHABLE_KEY>
+
+URL и Ключ берутся на странице проекта в Supabase.
+
 ### Compile and Hot-Reload for Development
 
 ```sh
@@ -46,3 +53,6 @@ npm run build
 ```sh
 npm run lint
 ```
+
+
+
