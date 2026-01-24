@@ -6,8 +6,8 @@ import vueDevTools from 'vite-plugin-vue-devtools'
 
 // https://vite.dev/config/
 export default defineConfig({
-  // Deploying to root user site (dmakhazen.github.io), not project site
-  base: '/',
+  // Deploying to project site (dmakhazen.github.io/easy-travel-front/)
+  base: '/easy-travel-front/',
   plugins: [
     vue(),
     vueDevTools(),
