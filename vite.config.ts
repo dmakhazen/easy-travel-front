@@ -6,10 +6,8 @@ import vueDevTools from 'vite-plugin-vue-devtools'
 
 // https://vite.dev/config/
 export default defineConfig({
-  // GitHub Pages needs a base path of "/<repo>/" when building in Actions.
-  base: process.env.GITHUB_ACTIONS
-    ? `/${process.env.GITHUB_REPOSITORY?.split('/')[1] ?? ''}/`
-    : '/',
+  // Deploying to root user site (dmakhazen.github.io), not project site
+  base: '/',
   plugins: [
     vue(),
     vueDevTools(),
