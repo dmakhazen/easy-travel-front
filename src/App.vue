@@ -1,21 +1,17 @@
-<script setup>
-import {ref, onMounted} from 'vue'
-import {supabase} from './lib/supabaseClient'
+<script setup lang="ts">
+import { onMounted } from 'vue'
+import { RouterView } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
 
-const instruments = ref([])
+const authStore = useAuthStore()
 
-async function getInstruments() {
-  const {data} = await supabase.from('instruments').select()
-  instruments.value = data
-}
-
-onMounted(() => {
-  getInstruments()
+onMounted(async () => {
+  await authStore.initialize()
 })
 </script>
 
 <template>
-  <ul>
-    <li v-for="instrument in instruments" :key="instrument.id">{{ instrument.name }}</li>
-  </ul>
+  <div id="app" class="min-h-screen bg-gray-100">
+    <RouterView />
+  </div>
 </template>
