@@ -31,6 +31,10 @@
         </ul>
         <p v-else class="text-gray-500">Нет инструментов</p>
       </div>
+      <div>
+        <RouterLink to="/trips" class="text-blue-600 hover:underline mt-6 inline-block"
+          >Перейти к путешествиям</RouterLink>
+      </div>
     </div>
   </div>
 </template>
