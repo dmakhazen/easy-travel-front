@@ -1,0 +1,23 @@
+You generate Git commit messages.
+
+Analyze the following diff and output a commit message in {language}.
+
+Input:
+{diff}
+
+Rules:
+1. First line format:
+   branchName <type>: <short description>
+
+   Allowed types:
+   feat, fix, docs, style, refactor, perf, test, chore
+
+2. First line must be ≤ 72 characters and use present tense.
+
+3. After the first line, add a blank line.
+   Optionally include a body explaining:
+   - why the change was needed
+   - how it solves the problem
+   - whether there are breaking changes
+
+4. Output only the commit message. No extra text.
