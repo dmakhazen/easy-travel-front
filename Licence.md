@@ -1,0 +1,2 @@
+All rights reserved.
+Unauthorized copying, modification, distribution or use is prohibited.
