@@ -1,5 +1,5 @@
 <template>
-  <Layout>
+  <TripsLayout>
     <template #header>
       <h1 class="text-2xl font-bold text-white">Путешествия</h1>
     </template>
@@ -14,15 +14,34 @@
           {{ trip.title }}
         </li>
       </ul>
-      <p v-else class="text-gray-500">Вы пока не создали путешествий</p>
+      <div v-else class="mx-auto mt-8 max-w-md">
+        <div class="rounded-lg bg-gray-100 p-8">
+          <p class="mb-4 text-gray-700">
+            Здесь будет ваш список путешествий и быстрый вход в детали каждой поездки.
+          </p>
+          <p class="mb-4 text-gray-700">
+            Внутри путешествия доступны описание, список желаний и список мест.
+          </p>
+          <p class="text-gray-700">
+            Также можно делиться путешествием и экспортировать его в файл.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          class="mx-auto mt-8 block w-full max-w-xs rounded bg-gray-400 px-6 py-3 font-medium text-gray-900 transition-colors hover:bg-gray-500"
+        >
+          создать новое путешествие
+        </button>
+      </div>
     </div>
-  </Layout>
+  </TripsLayout>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { supabase } from '@/lib/supabaseClient'
-import Layout from '@/components/core/layout.vue'
+import TripsLayout from '@/components/core/TripsLayout.vue'
 
 const trips = ref<any[]>([])
 

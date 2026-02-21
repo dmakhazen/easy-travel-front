@@ -1,6 +1,6 @@
 <template>
-  <div class="flex justify-center items-center min-h-screen bg-gray-100">
-    <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+  <AuthLayout>
+    <div>
       <h1 class="text-2xl font-bold text-center mb-6 text-gray-800">Сброс пароля</h1>
 
       <form v-if="!isRecoveryMode" @submit.prevent="handleRequestReset">
@@ -89,13 +89,14 @@
         <router-link to="/login" class="text-blue-500 hover:underline">Вернуться ко входу</router-link>
       </div>
     </div>
-  </div>
+  </AuthLayout>
 </template>
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import AuthLayout from '@/components/core/AuthLayout.vue'
 
 const route = useRoute()
 const router = useRouter()

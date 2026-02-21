@@ -1,6 +1,6 @@
 <template>
-  <div class="flex justify-center items-center min-h-screen bg-gray-100">
-    <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+  <AuthLayout>
+    <div>
       <h1 class="text-2xl font-bold text-center mb-6 text-gray-800">Вход</h1>
       <form @submit.prevent="handleLogin">
         <div class="mb-4">
@@ -50,13 +50,14 @@
         </p>
       </div>
     </div>
-  </div>
+  </AuthLayout>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import AuthLayout from '@/components/core/AuthLayout.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
