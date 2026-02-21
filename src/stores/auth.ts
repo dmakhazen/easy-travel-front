@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
+import { ref, computed, onScopeDispose } from 'vue'
 import { supabase } from '@/lib/supabaseClient'
 import type { User } from '@supabase/supabase-js'
 
@@ -7,26 +7,57 @@ export const useAuthStore = defineStore('auth', () => {
   const user = ref<User | null>(null)
   const loading = ref(false)
   const error = ref<string | null>(null)
+  const initialized = ref(false)
+
+  let initializePromise: Promise<void> | null = null
+  let unsubscribeAuthListener: (() => void) | null = null
 
   const isAuthenticated = computed(() => !!user.value)
 
   async function initialize() {
-    loading.value = true
-    try {
-      const {
-        data: { user: currentUser },
-      } = await supabase.auth.getUser()
-      user.value = currentUser
+    if (initialized.value) return
 
-      supabase.auth.onAuthStateChange((event, session) => {
-        user.value = session?.user ?? null
-      })
-    } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Unknown error'
-    } finally {
-      loading.value = false
+    if (initializePromise) {
+      return initializePromise
     }
+
+    error.value = null
+    loading.value = true
+    initializePromise = (async () => {
+      try {
+        const {
+          data: { user: currentUser },
+        } = await supabase.auth.getUser()
+        user.value = currentUser
+
+        if (!unsubscribeAuthListener) {
+          const { data } = supabase.auth.onAuthStateChange((_, session) => {
+            user.value = session?.user ?? null
+          })
+          unsubscribeAuthListener = () => {
+            data.subscription.unsubscribe()
+          }
+        }
+
+        initialized.value = true
+      } catch (err) {
+        error.value = err instanceof Error ? err.message : 'Unknown error'
+      } finally {
+        loading.value = false
+        initializePromise = null
+      }
+    })()
+
+    return initializePromise
   }
+
+  function cleanup() {
+    unsubscribeAuthListener?.()
+    unsubscribeAuthListener = null
+    initialized.value = false
+  }
+
+  onScopeDispose(cleanup)
 
   async function signUp(email: string, password: string) {
     loading.value = true
@@ -82,14 +113,51 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  async function requestPasswordReset(email: string, redirectTo?: string) {
+    loading.value = true
+    error.value = null
+    try {
+      const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo,
+      })
+      if (resetError) throw resetError
+      return { success: true }
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : 'Failed to request password reset'
+      return { success: false, error: error.value }
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function updatePassword(password: string) {
+    loading.value = true
+    error.value = null
+    try {
+      const { data, error: updateError } = await supabase.auth.updateUser({ password })
+      if (updateError) throw updateError
+      user.value = data.user
+      return { success: true }
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : 'Failed to update password'
+      return { success: false, error: error.value }
+    } finally {
+      loading.value = false
+    }
+  }
+
   return {
     user,
     loading,
     error,
+    initialized,
     isAuthenticated,
     initialize,
+    cleanup,
     signUp,
     signIn,
     signOut,
+    requestPasswordReset,
+    updatePassword,
   }
 })
