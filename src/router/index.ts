@@ -4,6 +4,9 @@ import Login from '@/views/Login.vue'
 import Register from '@/views/Register.vue'
 import Trips from '@/views/Trips.vue'
 import ResetPassword from '@/views/ResetPassword.vue'
+import TripEditor from '@/views/TripEditor.vue'
+import TripWishes from '@/views/TripWishes.vue'
+import TripLocations from '@/views/TripLocations.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -30,6 +33,30 @@ const router = createRouter({
       path: '/reset-password',
       name: 'reset-password',
       component: ResetPassword,
+    },
+    {
+      path: '/trips/new',
+      name: 'trip-new',
+      component: TripEditor,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/trips/:tripId',
+      name: 'trip-edit',
+      component: TripEditor,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/trips/:tripId/wishes',
+      name: 'trip-wishes',
+      component: TripWishes,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/trips/:tripId/locations',
+      name: 'trip-locations',
+      component: TripLocations,
+      meta: { requiresAuth: true },
     },
   ],
 })
