@@ -4,6 +4,8 @@
       <h1 class="text-2xl font-bold text-white">Путешествие</h1>
     </template>
 
+    <AppToast :message="toastMessage" />
+
     <div class="mx-auto w-full max-w-xl space-y-6">
       <div class="grid grid-cols-3 gap-2 rounded-lg border border-gray-200 bg-gray-100 p-1">
         <button
@@ -75,9 +77,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import TripsLayout from '@/components/core/TripsLayout.vue'
+import AppToast from '@/components/core/AppToast.vue'
 import { createTrip, exportTripBundle, getTripById, updateTrip } from '@/services/travel'
 
 const route = useRoute()
@@ -85,8 +88,10 @@ const router = useRouter()
 
 const loading = ref(false)
 const errorMessage = ref('')
+const toastMessage = ref('')
 const title = ref('')
 const initialTitle = ref('')
+let toastTimer: ReturnType<typeof setTimeout> | null = null
 
 const tripId = computed(() => {
   const value = route.params.tripId
@@ -112,6 +117,17 @@ async function loadTrip() {
 function sanitizeFileName(raw: string) {
   const value = raw.trim().toLowerCase()
   return value.replace(/[^a-z0-9а-яё_-]+/gi, '-').replace(/-+/g, '-').replace(/^-|-$/g, '') || 'trip'
+}
+
+function showToast(message: string) {
+  toastMessage.value = message
+  if (toastTimer) {
+    clearTimeout(toastTimer)
+  }
+  toastTimer = setTimeout(() => {
+    toastMessage.value = ''
+    toastTimer = null
+  }, 2600)
 }
 
 async function handleExport() {
@@ -140,7 +156,7 @@ async function handleNext() {
   const normalizedTitle = title.value.trim()
 
   if (!normalizedTitle) {
-    errorMessage.value = 'Введите название путешествия'
+    showToast('Введите название путешествия')
     return
   }
 
@@ -167,5 +183,11 @@ async function handleNext() {
 
 onMounted(() => {
   void loadTrip()
+})
+
+onUnmounted(() => {
+  if (toastTimer) {
+    clearTimeout(toastTimer)
+  }
 })
 </script>

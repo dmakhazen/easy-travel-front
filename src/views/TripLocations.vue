@@ -1,5 +1,7 @@
 <template>
   <TripsLayout>
+    <AppToast :message="toastMessage" />
+
     <div class="mx-auto w-full max-w-xl space-y-6">
       <div class="flex items-center justify-between gap-3">
         <h1 class="text-2xl font-bold text-gray-900">Места</h1>
@@ -90,7 +92,7 @@
       <button
         type="button"
         class="w-full rounded-md bg-teal-600 px-4 py-3 font-medium text-white"
-        @click="router.push('/')"
+        @click="handleFinish"
       >
         Завершить
       </button>
@@ -99,8 +101,9 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, onUnmounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import AppToast from '@/components/core/AppToast.vue'
 import TripsLayout from '@/components/core/TripsLayout.vue'
 import {
   createPlace,
@@ -119,15 +122,26 @@ const tripId = route.params.tripId as string
 
 const loading = ref(false)
 const errorMessage = ref('')
+const toastMessage = ref('')
 const tripTitle = ref('')
 const wishes = ref<Wish[]>([])
 const placesByWish = ref<Record<string, Place[]>>({})
 const newPlaceTitles = ref<Record<string, string>>({})
 const placeEditValues = ref<Record<string, string>>({})
+let toastTimer: ReturnType<typeof setTimeout> | null = null
 
 function setPlaceEditValue(placeId: string, event: Event) {
   const input = event.target as HTMLInputElement
   placeEditValues.value[placeId] = input.value
+}
+
+function showToast(message: string) {
+  toastMessage.value = message
+  if (toastTimer) clearTimeout(toastTimer)
+  toastTimer = setTimeout(() => {
+    toastMessage.value = ''
+    toastTimer = null
+  }, 2400)
 }
 
 async function load() {
@@ -214,7 +228,20 @@ async function handleDeletePlace(wishId: string, placeId: string) {
   }
 }
 
+function handleFinish() {
+  const hasAtLeastOnePlace = Object.values(placesByWish.value).some((places) => places.length > 0)
+  if (!hasAtLeastOnePlace) {
+    showToast('Добавьте место')
+    return
+  }
+  void router.push('/')
+}
+
 onMounted(() => {
   void load()
+})
+
+onUnmounted(() => {
+  if (toastTimer) clearTimeout(toastTimer)
 })
 </script>
