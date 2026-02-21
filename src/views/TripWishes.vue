@@ -4,6 +4,8 @@
       <h1 class="text-2xl font-bold text-white">Желания</h1>
     </template>
 
+    <AppToast :message="toastMessage" />
+
     <div class="mx-auto w-full max-w-xl space-y-6">
       <div class="grid grid-cols-3 gap-2 rounded-lg border border-gray-200 bg-gray-100 p-1">
         <button
@@ -84,7 +86,7 @@
       <button
         type="button"
         class="w-full rounded-md bg-teal-600 px-4 py-3 font-medium text-white"
-        @click="router.push(`/trips/${tripId}/locations`)"
+        @click="handleNext"
       >
         Далее
       </button>
@@ -93,9 +95,10 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, onUnmounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import TripsLayout from '@/components/core/TripsLayout.vue'
+import AppToast from '@/components/core/AppToast.vue'
 import {
   createWish,
   deleteWish,
@@ -110,13 +113,24 @@ const tripId = route.params.tripId as string
 
 const loading = ref(false)
 const errorMessage = ref('')
+const toastMessage = ref('')
 const wishes = ref<Wish[]>([])
 const newWishTitle = ref('')
 const editValues = ref<Record<string, string>>({})
+let toastTimer: ReturnType<typeof setTimeout> | null = null
 
 function setEditValue(wishId: string, event: Event) {
   const input = event.target as HTMLInputElement
   editValues.value[wishId] = input.value
+}
+
+function showToast(message: string) {
+  toastMessage.value = message
+  if (toastTimer) clearTimeout(toastTimer)
+  toastTimer = setTimeout(() => {
+    toastMessage.value = ''
+    toastTimer = null
+  }, 2400)
 }
 
 async function load() {
@@ -180,7 +194,19 @@ async function handleDeleteWish(wishId: string) {
   }
 }
 
+function handleNext() {
+  if (wishes.value.length === 0) {
+    showToast('Добавьте желание')
+    return
+  }
+  void router.push(`/trips/${tripId}/locations`)
+}
+
 onMounted(() => {
   void load()
+})
+
+onUnmounted(() => {
+  if (toastTimer) clearTimeout(toastTimer)
 })
 </script>
