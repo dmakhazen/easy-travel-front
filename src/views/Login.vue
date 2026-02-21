@@ -35,6 +35,11 @@
         >
           {{ authStore.loading ? 'Вход...' : 'Войти' }}
         </button>
+        <div class="mt-3 text-right">
+          <router-link to="/reset-password" class="text-sm text-blue-500 hover:underline">
+            Забыли пароль?
+          </router-link>
+        </div>
       </form>
       <div class="mt-6 text-center text-gray-600">
         <p>

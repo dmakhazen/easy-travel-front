@@ -113,6 +113,39 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  async function requestPasswordReset(email: string, redirectTo?: string) {
+    loading.value = true
+    error.value = null
+    try {
+      const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo,
+      })
+      if (resetError) throw resetError
+      return { success: true }
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : 'Failed to request password reset'
+      return { success: false, error: error.value }
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function updatePassword(password: string) {
+    loading.value = true
+    error.value = null
+    try {
+      const { data, error: updateError } = await supabase.auth.updateUser({ password })
+      if (updateError) throw updateError
+      user.value = data.user
+      return { success: true }
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : 'Failed to update password'
+      return { success: false, error: error.value }
+    } finally {
+      loading.value = false
+    }
+  }
+
   return {
     user,
     loading,
@@ -124,5 +157,7 @@ export const useAuthStore = defineStore('auth', () => {
     signUp,
     signIn,
     signOut,
+    requestPasswordReset,
+    updatePassword,
   }
 })
